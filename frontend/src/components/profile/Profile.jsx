@@ -60,15 +60,15 @@ const Profile = () => {
     });
   };
 
-  const handleProfileSubmit = async (e) => {
+  const handleProfileSubmit = (e) => {
     e.preventDefault();
-    await updateProfile(formData);
+    updateProfile(formData);
     setProfile(false);
   };
 
-  const handlePasswordSubmit = async (e) => {
+  const handlePasswordSubmit = (e) => {
     e.preventDefault();
-    await updatePassword(passwordData);
+    updatePassword(passwordData);
     setPassword(false);
   };
 

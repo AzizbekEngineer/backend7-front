@@ -74,40 +74,57 @@ class UsersController {
 
   async updatePassword(req, res) {
     try {
+      // Foydalanuvchini ID orqali topish
       const user = await Users.findById(req.user._id);
       if (!user) {
         return res.status(404).json({
-          msg: "User not found.",
+          msg: "Foydalanuvchi topilmadi.",
           variant: "error",
           payload: null,
         });
       }
 
-      const isPassword = await bcrypt.compare(
+      // Eski parolni tekshirish
+      const isPasswordCorrect = await bcrypt.compare(
         req.body.oldPassword,
         user.password
       );
-      if (!isPassword) {
+      if (!isPasswordCorrect) {
         return res.status(400).json({
-          msg: "Incorrect old password.",
+          msg: "Eski parol noto'g'ri.",
           variant: "error",
           payload: null,
         });
       }
 
+      // Yangi parolni tekshirish va validatsiya qilish
+      if (!req.body.newPassword || req.body.newPassword.length < 8) {
+        return res.status(400).json({
+          msg: "Yangi parol kamida 8 ta belgidan iborat bo'lishi kerak.",
+          variant: "error",
+          payload: null,
+        });
+      }
+
+      // Yangi parolni hash qilish
       const newPasswordHash = await bcrypt.hash(req.body.newPassword, 10);
       user.password = newPasswordHash;
+
+      // Foydalanuvchini yangilash
       await user.save();
 
+      // Muvaffaqiyatli javob qaytarish
       res.status(200).json({
-        msg: "Password updated successfully",
+        msg: "Parol muvaffaqiyatli yangilandi",
         variant: "success",
         payload: null,
       });
     } catch (error) {
-      console.error("Error updating password:", error);
+      // Xatolikni log qilish
+      console.error("Parolni yangilashda xato:", error);
+
       res.status(500).json({
-        msg: "Server error",
+        msg: "Server xatosi",
         variant: "error",
         payload: null,
       });
