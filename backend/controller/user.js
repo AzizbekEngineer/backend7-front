@@ -24,6 +24,96 @@ class UsersController {
     }
   }
 
+  async updateProfile(req, res) {
+    try {
+      let profile = await Users.findOne({ _id: req.user._id });
+      if (!profile) {
+        return res.status(404).json({
+          msg: "Profile not found.",
+          variant: "error",
+          payload: null,
+        });
+      }
+
+      const existingProfile = await Users.findOne({
+        username: req.body.username,
+      });
+      if (
+        existingProfile &&
+        existingProfile._id.toString() !== req.user._id.toString()
+      ) {
+        return res.status(400).json({
+          msg: "Username already exists.",
+          variant: "error",
+          payload: null,
+        });
+      }
+
+      if (!req.body.password) {
+        req.body.password = profile.password;
+      }
+
+      const newProfile = await Users.findByIdAndUpdate(req.user._id, req.body, {
+        new: true,
+      });
+
+      res.status(200).json({
+        msg: "Profile is updated",
+        variant: "success",
+        payload: newProfile,
+      });
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      res.status(500).json({
+        msg: "Server error",
+        variant: "error",
+        payload: null,
+      });
+    }
+  }
+
+  async updatePassword(req, res) {
+    try {
+      const user = await Users.findById(req.user._id);
+      if (!user) {
+        return res.status(404).json({
+          msg: "User not found.",
+          variant: "error",
+          payload: null,
+        });
+      }
+
+      const isPassword = await bcrypt.compare(
+        req.body.oldPassword,
+        user.password
+      );
+      if (!isPassword) {
+        return res.status(400).json({
+          msg: "Incorrect old password.",
+          variant: "error",
+          payload: null,
+        });
+      }
+
+      const newPasswordHash = await bcrypt.hash(req.body.newPassword, 10);
+      user.password = newPasswordHash;
+      await user.save();
+
+      res.status(200).json({
+        msg: "Password updated successfully",
+        variant: "success",
+        payload: null,
+      });
+    } catch (error) {
+      console.error("Error updating password:", error);
+      res.status(500).json({
+        msg: "Server error",
+        variant: "error",
+        payload: null,
+      });
+    }
+  }
+
   async registerUser(req, res) {
     try {
       const { error } = validateUser(req.body);

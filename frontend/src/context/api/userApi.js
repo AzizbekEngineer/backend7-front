@@ -14,7 +14,23 @@ export const userApi = api.injectEndpoints({
         url: "/api/profile",
         params,
       }),
-      providesTags: ["User"],
+      providesTags: ["Profile"],
+    }),
+    updateProfile: build.mutation({
+      query: (body) => ({
+        url: `/api/updateProfile`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Profile"],
+    }),
+    updatePassword: build.mutation({
+      query: (body) => ({
+        url: `/api/updatePassword`,
+        method: "PATCH",
+        body,
+      }),
+      invalidatesTags: ["Profile"],
     }),
     getUserById: build.query({
       query: (id) => ({
@@ -58,6 +74,8 @@ export const userApi = api.injectEndpoints({
 
 export const {
   useGetUsersQuery,
+  useUpdateProfileMutation,
+  useUpdatePasswordMutation,
   useGetProfileQuery,
   useSignUpUserMutation,
   useSingInUserMutation,

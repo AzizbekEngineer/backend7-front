@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSignUpUserMutation } from "../../context/api/userApi";
 import "./register.scss";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const initialState = {
   fname: "",
@@ -121,6 +121,10 @@ const Register = () => {
             placeholder="Budget"
           />
         </label>
+        <div className="register__link">
+          <p>Have you account?</p>
+          <NavLink to="/login">Login</NavLink>
+        </div>
         <button type="submit">Create</button>
       </form>
     </div>
